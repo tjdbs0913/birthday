@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2027년 운 좋은 생일 순위 조회 (우라나이3)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans KR', 'Inter', sans-serif;
+            background: linear-gradient(135deg, #ffffff 0%, #fff1f5 50%, #fce7f3 100%);
+            min-height: 100vh;
+        }
+        /* 커스텀 스크롤바 */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #ffffff;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #f9a8d4;
+            border-radius: 9999px;
+        }
+        .rank-card-pop {
+            animation: popIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+        @keyframes popIn {
+            0% { transform: scale(0.95); opacity: 0.5; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+    </style>
+</head>
+<body class="flex flex-col items-center justify-start py-8 px-4 sm:px-6 text-gray-800">
+
+    <!-- 메인 컨테이너 -->
+    <main class="w-full max-w-md bg-white/95 backdrop-blur-md rounded-3xl shadow-xl border border-pink-100 overflow-hidden">
+        
+        <!-- 헤더 영역 -->
+        <header class="bg-gradient-to-br from-white via-pink-100 to-pink-200 p-6 text-pink-950 text-center relative overflow-hidden border-b border-pink-100">
+            <div class="absolute -top-6 -right-6 w-24 h-24 bg-white/70 rounded-full blur-xl"></div>
+            <div class="absolute -bottom-6 -left-6 w-20 h-20 bg-white/70 rounded-full blur-lg"></div>
+            <span class="inline-block px-3 py-1 bg-white/90 backdrop-blur-sm rounded-full text-xs font-bold text-pink-600 tracking-wider mb-2 shadow-sm">
+                일본 점술 사이트 "우라나이3" 선정
+            </span>
+            <h1 class="text-2xl sm:text-3xl font-black tracking-tight text-pink-900">2027년 운 좋은 생일</h1>
+            <p class="text-pink-700 text-sm mt-1 font-medium">생일을 선택하면 바로 순위가 바뀝니다 ✨</p>
+        </header>
+
+        <!-- 상단 입력/선택 컨트롤 영역 -->
+        <section class="p-6 border-b border-pink-100 bg-white">
+            <label class="block text-xs font-bold text-pink-400 uppercase tracking-wider mb-3 text-center">
+                내 생일 선택
+            </label>
+
+            <!-- 드롭다운 선택기 (모바일 터치 최적화) -->
+            <div class="grid grid-cols-2 gap-3">
+                <div class="relative">
+                    <select id="monthSelect" aria-label="월 선택"
+                        class="w-full appearance-none bg-gradient-to-b from-white to-pink-50/70 hover:to-pink-100/70 border-2 border-pink-200 focus:border-pink-400 focus:bg-white rounded-2xl py-3.5 px-4 text-lg font-bold text-gray-800 text-center cursor-pointer transition-all outline-none shadow-sm">
+                        <!-- JS로 1월~12월 생성 -->
+                    </select>
+                    <div class="pointer-events-none absolute inset-y-0 right-3 flex items-center text-pink-400">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"></path></svg>
+                    </div>
+                </div>
+
+                <div class="relative">
+                    <select id="daySelect" aria-label="일 선택"
+                        class="w-full appearance-none bg-gradient-to-b from-white to-pink-50/70 hover:to-pink-100/70 border-2 border-pink-200 focus:border-pink-400 focus:bg-white rounded-2xl py-3.5 px-4 text-lg font-bold text-gray-800 text-center cursor-pointer transition-all outline-none shadow-sm">
+                        <!-- JS로 일자 동적 생성 -->
+                    </select>
+                    <div class="pointer-events-none absolute inset-y-0 right-3 flex items-center text-pink-400">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"></path></svg>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 하단 실시간 순위 결과 출력 영역 -->
+        <section id="resultSection" class="p-6 sm:p-8 bg-gradient-to-b from-white via-pink-50/40 to-white text-center">
+            <div id="resultCard" class="rank-card-pop">
+                <!-- 배지 (상위권/중위권/하위권 표시) -->
+                <div id="tierBadge" class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-extrabold bg-white text-pink-600 border border-pink-200 mb-3 shadow-sm">
+                    👑 최상위권 대길
+                </div>
+
+                <!-- 선택된 날짜 -->
+                <div class="text-gray-500 font-semibold text-base mb-1">
+                    <span id="displayDate" class="text-gray-900 font-extrabold text-xl">11월 13일</span> 생일은 2027년
+                </div>
+
+                <!-- 메인 순위 숫자 -->
+                <div class="my-3 flex items-baseline justify-center gap-1">
+                    <span class="text-2xl font-bold text-pink-400">전체</span>
+                    <span id="displayRank" class="text-6xl sm:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-pink-300 tracking-tighter">
+                        1
+                    </span>
+                    <span class="text-3xl font-extrabold text-gray-800">위</span>
+                </div>
+
+                <!-- 백분위 및 총원 -->
+                <p id="displayPercentile" class="text-sm font-medium text-gray-500 mb-5">
+                    366일 중 <span class="text-pink-500 font-bold">상위 0.3%</span> 행운의 주인공!
+                </p>
+
+                <!-- 게이지 바 (1위 왼쪽 -> 366위 오른쪽 방향) -->
+                <div class="w-full bg-white border border-pink-100 rounded-full h-3.5 mb-2 overflow-hidden p-0.5 flex justify-start shadow-inner">
+                    <div id="luckGauge" class="bg-gradient-to-r from-pink-400 via-pink-300 to-pink-100 h-2 rounded-full transition-all duration-500" style="width: 100%"></div>
+                </div>
+                <div class="flex justify-between text-[11px] font-semibold text-gray-400 px-1">
+                    <span class="text-pink-500 font-bold">1위 (최고)</span>
+                    <span>183위 (평균)</span>
+                    <span>366위 (꼴찌)</span>
+                </div>
+
+                <!-- 결과 복사 버튼 -->
+                <button id="copyBtn" type="button"
+                    class="mt-6 w-full py-3 px-4 bg-gradient-to-r from-pink-300 to-pink-400 hover:from-pink-400 hover:to-pink-500 active:scale-[0.98] text-white text-sm font-bold rounded-xl shadow-sm transition-all flex items-center justify-center gap-2 cursor-pointer">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>
+                    <span id="copyBtnText">내 순위 결과 복사하기</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- 하단 참고: TOP 5 및 꼴찌 미리보기 토글 -->
+        <footer class="bg-pink-50/40 px-6 py-4 border-t border-pink-100">
+            <details class="group">
+                <summary class="flex items-center justify-between text-xs font-bold text-pink-600 cursor-pointer list-none">
+                    <span>🏆 2027년 TOP 5 & 최하위 생일 보기</span>
+                    <span class="transition group-open:rotate-180">▼</span>
+                </summary>
+                <div class="mt-3 pt-3 border-t border-gray-200/70 grid grid-cols-2 gap-3 text-xs">
+                    <div class="bg-white p-3 rounded-xl border border-pink-100">
+                        <div class="font-bold text-pink-600 mb-1.5">✨ 행운 TOP 5</div>
+                        <ul class="space-y-1 text-gray-600">
+                            <li><strong class="text-gray-900">1위</strong> 11월 13일</li>
+                            <li><strong class="text-gray-900">2위</strong> 11월 22일</li>
+                            <li><strong class="text-gray-900">3위</strong> 12월 3일</li>
+                            <li><strong class="text-gray-900">4위</strong> 8월 16일</li>
+                            <li><strong class="text-gray-900">5위</strong> 8월 25일</li>
+                        </ul>
+                    </div>
+                    <div class="bg-white p-3 rounded-xl border border-gray-200">
+                        <div class="font-bold text-gray-600 mb-1.5">🍀 액땜 필요 하위 5</div>
+                        <ul class="space-y-1 text-gray-600">
+                            <li><strong class="text-gray-900">362위</strong> 6월 5일</li>
+                            <li><strong class="text-gray-900">363위</strong> 10월 12일</li>
+                            <li><strong class="text-gray-900">364위</strong> 7월 4일</li>
+                            <li><strong class="text-gray-900">365위</strong> 5월 17일</li>
+                            <li><strong class="text-gray-900">366위</strong> 6월 16일</li>
+                        </ul>
+                    </div>
+                </div>
+            </details>
+        </footer>
+    </main>
+
+    <!-- 숨겨진 복사 전용 텍스트 영역 -->
+    <textarea id="copyHelper" class="sr-only" aria-hidden="true"></textarea>
+
+    <script>
+        // 원글 이미지(1위 ~ 366위)에서 정확히 추출한 전체 순위 데이터 배열 (인덱스 0 = 1위, 인덱스 365 = 366위)
+        const rankList = [
+            // 1위 ~ 23위 (1열 상단)
+            "11월 13일", "11월 22일", "12월 3일", "8월 16일", "8월 25일", "9월 6일", "11월 14일", "11월 23일", "12월 4일", "9월 15일",
+            "9월 24일", "10월 5일", "8월 8일", "8월 17일", "8월 26일", "9월 7일", "12월 12일", "12월 21일", "12월 30일", "11월 20일",
+            "11월 29일", "12월 1일", "9월 16일",
+            // 24위 ~ 46위 (1열 2번째)
+            "9월 25일", "10월 6일", "3월 12일", "3월 21일", "3월 30일", "4월 2일", "8월 23일", "9월 4일", "12월 13일", "12월 22일",
+            "12월 31일", "11월 21일", "11월 30일", "12월 2일", "11월 12일", "2월 4일", "2월 13일", "2월 22일", "3월 3일", "9월 22일",
+            "10월 3일", "3월 13일", "3월 22일",
+            // 47위 ~ 69위 (1열 3번째)
+            "3월 31일", "4월 3일", "8월 24일", "9월 5일", "8월 15일", "4월 11일", "4월 20일", "4월 29일", "5월 1일", "1월 3일",
+            "12월 19일", "12월 28일", "11월 8일", "11월 17일", "11월 26일", "2월 5일", "2월 14일", "2월 23일", "3월 4일", "9월 23일",
+            "10월 4일", "9월 14일", "1월 5일",
+            // 70위 ~ 92위 (1열 4번째)
+            "1월 14일", "1월 23일", "3월 10일", "3월 28일", "9월 1일", "8월 11일", "8월 20일", "8월 29일", "4월 12일", "4월 21일",
+            "4월 30일", "5월 2일", "1월 4일", "12월 20일", "12월 29일", "12월 11일", "7월 8일", "7월 17일", "7월 26일", "8월 7일",
+            "2월 11일", "2월 29일", "3월 1일",
+
+            // 93위 ~ 115위 (2번째 이미지 1열)
+            "9월 10일", "9월 19일", "9월 28일", "1월 6일", "1월 15일", "1월 24일", "3월 11일", "3월 29일", "4월 1일", "3월 20일",
+            "10월 14일", "10월 23일", "11월 4일", "4월 9일", "4월 27일", "12월 7일", "12월 16일", "12월 25일", "11월 15일", "11월 24일",
+            "12월 5일", "7월 9일", "7월 18일",
+            // 116위 ~ 138위 (2번째 이미지 2열)
+            "7월 27일", "2월 12일", "3월 2일", "2월 21일", "5월 10일", "5월 19일", "5월 28일", "1월 12일", "1월 30일", "2월 2일",
+            "3월 7일", "3월 16일", "3월 25일", "8월 9일", "8월 18일", "8월 27일", "10월 15일", "10월 24일", "11월 5일", "4월 10일",
+            "4월 28일", "4월 19일", "6월 9일",
+            // 139위 ~ 161위 (2번째 이미지 3열)
+            "6월 18일", "6월 27일", "11월 9일", "11월 18일", "11월 27일", "7월 24일", "8월 5일", "2월 8일", "2월 17일", "2월 26일",
+            "9월 8일", "9월 17일", "9월 26일", "10월 7일", "5월 11일", "5월 20일", "5월 29일", "6월 1일", "1월 13일", "1월 31일",
+            "2월 3일", "1월 22일", "3월 6일",
+            // 162위 ~ 184위 (2번째 이미지 4열)
+            "8월 12일", "8월 21일", "8월 30일", "10월 21일", "10월 30일", "11월 2일", "4월 6일", "5월 5일", "4월 15일", "4월 24일",
+            "12월 14일", "12월 23일", "6월 10일", "6월 19일", "6월 28일", "11월 10일", "11월 19일", "11월 28일", "7월 7일", "7월 25일",
+            "8월 6일", "7월 16일", "2월 7일",
+
+            // 185위 ~ 207위 (3번째 이미지 1열)
+            "9월 11일", "9월 20일", "9월 29일", "5월 8일", "5월 26일", "1월 9일", "1월 18일", "1월 27일", "3월 14일", "3월 23일",
+            "4월 4일", "8월 13일", "8월 22일", "8월 31일", "9월 3일", "10월 22일", "10월 31일", "11월 3일", "10월 13일", "4월 5일",
+            "5월 4일", "1월 1일", "12월 8일",
+            // 208위 ~ 230위 (3번째 이미지 2열)
+            "12월 17일", "12월 26일", "6월 7일", "6월 25일", "7월 6일", "11월 16일", "11월 25일", "12월 6일", "8월 2일", "7월 12일",
+            "7월 21일", "7월 30일", "2월 6일", "2월 15일", "2월 24일", "3월 5일", "9월 12일", "9월 21일", "9월 30일", "10월 2일",
+            "5월 9일", "5월 27일", "5월 18일",
+            // 231위 ~ 253위 (3번째 이미지 3열)
+            "1월 8일", "3월 17일", "3월 26일", "8월 10일", "8월 19일", "8월 28일", "10월 9일", "10월 18일", "10월 27일", "4월 13일",
+            "4월 22일", "5월 3일", "1월 2일", "12월 9일", "12월 18일", "12월 27일", "6월 8일", "6월 26일", "6월 17일", "8월 1일",
+            "2월 18일", "2월 27일", "9월 9일",
+            // 254위 ~ 276위 (3번째 이미지 4열)
+            "9월 18일", "9월 27일", "6월 4일", "5월 14일", "5월 23일", "1월 7일", "1월 16일", "1월 25일", "3월 18일", "3월 27일",
+            "3월 9일", "9월 2일", "4월 16일", "4월 25일", "12월 15일", "12월 24일", "7월 3일", "6월 13일", "6월 22일", "11월 11일",
+            "7월 10일", "7월 19일", "7월 28일",
+
+            // 277위 ~ 299위 (4번째 이미지 1열)
+            "2월 19일", "2월 28일", "2월 10일", "10월 1일", "6월 3일", "1월 19일", "1월 28일", "3월 15일", "3월 24일", "8월 14일",
+            "10월 16일", "10월 25일", "11월 6일", "4월 17일", "4월 26일", "4월 8일", "7월 2일", "7월 13일", "7월 22일", "7월 31일",
+            "2월 16일", "2월 25일", "9월 13일",
+            // 300위 ~ 322위 (4번째 이미지 2열)
+            "5월 12일", "5월 21일", "5월 30일", "6월 2일", "1월 20일", "1월 29일", "2월 1일", "1월 11일", "3월 8일", "10월 10일",
+            "10월 19일", "10월 28일", "4월 14일", "4월 23일", "12월 10일", "6월 11일", "6월 20일", "6월 29일", "7월 1일", "7월 14일",
+            "7월 23일", "8월 4일", "2월 9일",
+            // 323위 ~ 345위 (4번째 이미지 3열)
+            "5월 15일", "5월 24일", "1월 17일", "1월 26일", "3월 19일", "10월 11일", "10월 20일", "10월 29일", "11월 1일", "4월 7일",
+            "6월 14일", "6월 23일", "7월 11일", "7월 20일", "7월 29일", "2월 20일", "5월 16일", "5월 25일", "5월 7일", "1월 10일",
+            "10월 8일", "10월 17일", "10월 26일",
+            // 346위 ~ 366위 (4번째 이미지 4열)
+            "11월 7일", "4월 18일", "6월 15일", "6월 24일", "6월 6일", "7월 5일", "8월 3일", "5월 13일", "5월 22일", "5월 31일",
+            "1월 21일", "6월 12일", "6월 21일", "6월 30일", "7월 15일", "5월 6일", "6월 5일", "10월 12일", "7월 4일", "5월 17일",
+            "6월 16일"
+        ];
+
+        // 빠른 조회를 위한 Map 생성 ("11월 13일" -> 1)
+        const rankMap = new Map();
+        rankList.forEach((dateStr, index) => {
+            rankMap.set(dateStr, index + 1);
+        });
+
+        // 월별 최대 일수 (윤년 2월 29일 포함)
+        const daysInMonth = {
+            1: 31, 2: 29, 3: 31, 4: 30, 5: 31, 6: 30,
+            7: 31, 8: 31, 9: 30, 10: 31, 11: 30, 12: 31
+        };
+
+        // DOM 요소 참조
+        const monthSelect = document.getElementById('monthSelect');
+        const daySelect = document.getElementById('daySelect');
+        const resultCard = document.getElementById('resultCard');
+        const tierBadge = document.getElementById('tierBadge');
+        const displayDate = document.getElementById('displayDate');
+        const displayRank = document.getElementById('displayRank');
+        const displayPercentile = document.getElementById('displayPercentile');
+        const luckGauge = document.getElementById('luckGauge');
+        const copyBtn = document.getElementById('copyBtn');
+        const copyBtnText = document.getElementById('copyBtnText');
+        const copyHelper = document.getElementById('copyHelper');
+
+        // 초기화: 월 셀렉트 옵션 채우기
+        function initMonths() {
+            for (let m = 1; m <= 12; m++) {
+                const opt = document.createElement('option');
+                opt.value = m;
+                opt.textContent = `${m}월`;
+                monthSelect.appendChild(opt);
+            }
+        }
+
+        // 선택된 월에 맞춰 일 셀렉트 옵션 갱신
+        function updateDays(selectedMonth, keepDay = null) {
+            const maxDay = daysInMonth[selectedMonth] || 31;
+            const currentDay = keepDay !== null ? keepDay : (parseInt(daySelect.value, 10) || 1);
+            const targetDay = Math.min(currentDay, maxDay);
+
+            daySelect.innerHTML = '';
+            for (let d = 1; d <= maxDay; d++) {
+                const opt = document.createElement('option');
+                opt.value = d;
+                opt.textContent = `${d}일`;
+                if (d === targetDay) opt.selected = true;
+                daySelect.appendChild(opt);
+            }
+        }
+
+        // 순위에 따른 티어, 배지 결정
+        function getRankDetails(rank) {
+            const total = 366;
+            const topPercent = ((rank / total) * 100).toFixed(1);
+            // 1위가 왼쪽(100% 채움), 366위가 오른쪽(최소 채움)이 되도록 계산
+            const gaugePercent = Math.max(3, Math.round(((total - rank + 1) / total) * 100));
+
+            if (rank <= 10) {
+                return {
+                    badgeText: "👑 TOP 10 초대박 길일",
+                    badgeClass: "bg-pink-100 text-pink-700 border border-pink-200",
+                    rankGradient: "from-pink-500 via-pink-400 to-rose-300",
+                    topPercent,
+                    gaugePercent
+                };
+            } else if (rank <= 50) {
+                return {
+                    badgeText: "✨ 최상위권 대길",
+                    badgeClass: "bg-pink-100 text-pink-600 border border-pink-200",
+                    rankGradient: "from-pink-400 to-rose-300",
+                    topPercent,
+                    gaugePercent
+                };
+            } else if (rank <= 120) {
+                return {
+                    badgeText: "🌸 상위권 길운",
+                    badgeClass: "bg-pink-50 text-pink-500 border border-pink-200",
+                    rankGradient: "from-pink-400 to-pink-300",
+                    topPercent,
+                    gaugePercent
+                };
+            } else if (rank <= 240) {
+                return {
+                    badgeText: "🍀 평온한 중위권",
+                    badgeClass: "bg-rose-50 text-rose-500 border border-rose-100",
+                    rankGradient: "from-rose-400 to-pink-300",
+                    topPercent,
+                    gaugePercent
+                };
+            } else if (rank <= 330) {
+                return {
+                    badgeText: "🌱 대기만성형 운세",
+                    badgeClass: "bg-pink-50/70 text-pink-500 border border-pink-100",
+                    rankGradient: "from-pink-400 to-rose-300",
+                    topPercent,
+                    gaugePercent
+                };
+            } else {
+                return {
+                    badgeText: "🛡️ 액땜 & 반전 매력",
+                    badgeClass: "bg-pink-50 text-pink-400 border border-pink-100",
+                    rankGradient: "from-rose-400 to-pink-300",
+                    topPercent,
+                    gaugePercent
+                };
+            }
+        }
+
+        // 화면에 결과 즉시 업데이트 (페이지 전환 없음)
+        function renderResult() {
+            const m = parseInt(monthSelect.value, 10);
+            const d = parseInt(daySelect.value, 10);
+            const dateKey = `${m}월 ${d}일`;
+            const rank = rankMap.get(dateKey);
+
+            if (!rank) return;
+
+            const details = getRankDetails(rank);
+
+            // 애니메이션 재트리거
+            resultCard.classList.remove('rank-card-pop');
+            void resultCard.offsetWidth; // reflow
+            resultCard.classList.add('rank-card-pop');
+
+            displayDate.textContent = dateKey;
+            displayRank.textContent = rank;
+            displayRank.className = `text-6xl sm:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r ${details.rankGradient} tracking-tighter`;
+            
+            tierBadge.textContent = details.badgeText;
+            tierBadge.className = `inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-extrabold mb-3 shadow-sm ${details.badgeClass}`;
+
+            displayPercentile.innerHTML = `366일 중 <span class="text-pink-500 font-bold">상위 ${details.topPercent}%</span> (전체 ${rank}위)`;
+            luckGauge.style.width = `${details.gaugePercent}%`;
+        }
+
+        // 이벤트 리스너 등록
+        monthSelect.addEventListener('change', () => {
+            updateDays(parseInt(monthSelect.value, 10));
+            renderResult();
+        });
+
+        daySelect.addEventListener('change', () => {
+            renderResult();
+        });
+
+        // 클립보드 복사 기능 (iframe 호환 execCommand 사용)
+        copyBtn.addEventListener('click', () => {
+            const dateText = displayDate.textContent;
+            const rankText = displayRank.textContent;
+            const shareText = `[2027년 운 좋은 생일 순위]\n내 생일(${dateText})은 366일 중 ${rankText}위! ✨`;
+
+            copyHelper.value = shareText;
+            copyHelper.select();
+            copyHelper.setSelectionRange(0, 99999);
+            
+            try {
+                document.execCommand('copy');
+                copyBtnText.textContent = '복사 완료! 친구에게 공유해보세요 🎉';
+                copyBtn.classList.remove('from-pink-300', 'to-pink-400');
+                copyBtn.classList.add('from-pink-500', 'to-pink-600');
+                setTimeout(() => {
+                    copyBtnText.textContent = '내 순위 결과 복사하기';
+                    copyBtn.classList.remove('from-pink-500', 'to-pink-600');
+                    copyBtn.classList.add('from-pink-300', 'to-pink-400');
+                }, 2000);
+            } catch (err) {
+                copyBtnText.textContent = '복사에 실패했습니다';
+            }
+        });
+
+        // 초기 실행: 1위 생일(11월 13일) 또는 원글 작성자 생일(6월 4일 - 256위)로 세팅
+        initMonths();
+        monthSelect.value = 6;
+        updateDays(6, 4);
+        renderResult();
+    </script>
+</body>
+</html>
